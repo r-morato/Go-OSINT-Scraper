@@ -11,7 +11,7 @@ func GetWHOIS(domain string) {
 
     var whoisCmd string
     if runtime.GOOS == "windows" {
-        whoisCmd = "whois.exe" // Assumes whois.exe is available in PATH on Windows
+        whoisCmd = "whois.exe"
     } else {
         whoisCmd = "whois"
     }

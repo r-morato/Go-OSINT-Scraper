@@ -18,10 +18,16 @@ var rootCmd = &cobra.Command{
         if domain != "" {
             modules.LookupDNS(domain)
             modules.GetWHOIS(domain)
+            modules.ReverseIP(domain)
+            modules.FindSubdomains(domain)
+            modules.EmailHarvester(domain)
+            modules.TechFingerprint(domain)
         }
         if username != "" {
             modules.CheckUsername(username)
+            modules.CheckUsernameOtherSites(username)
         }
+        modules.ExportResults(domain, username)
     },
 }
 

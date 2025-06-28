@@ -1,9 +1,9 @@
 package main
 
 import (
-	"go-osint-scraper/cmd"
+    "go-osint-scraper/cmd"
 )
 
 func main() {
-	cmd.Execute()
+    cmd.Execute()
 }
