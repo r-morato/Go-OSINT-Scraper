@@ -1,4 +1,4 @@
-# go-osint-scraper 🕵️‍♂️
+# Go-OSINT-Scraper
 
 A simple and fast OSINT tool written in Go to gather open-source intelligence about domains and usernames. Useful for recon, bug bounty, or blue team asset discovery.
 
