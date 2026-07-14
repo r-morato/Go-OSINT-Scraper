@@ -6,15 +6,15 @@ A command-line tool written in Go for gathering Open Source Intelligence (OSINT)
 
 This tool includes:
 
-- ✅ **DNS Lookup** – Resolves the A records for a domain
-- ✅ **WHOIS Lookup** – Retrieves domain registration info (requires `whois` installed)
-- ✅ **Reverse IP Lookup** – Gets the resolved IP (basic simulation; use APIs for full data)
-- ✅ **Subdomain Enumeration** – Simulated subdomain generation
-- ✅ **Email Harvester** – Extracts email addresses from the homepage
-- ✅ **Technology Fingerprinting** – Shows HTTP headers for basic tech insight
-- ✅ **Username Check (GitHub)** – Checks if a GitHub profile exists
-- ✅ **Username Check (Twitter, Reddit)** – Basic existence check on additional platforms
-- ✅ **Export Results** – Saves results to `osint_report.txt`
+-  **DNS Lookup** – Resolves the A records for a domain
+-  **WHOIS Lookup** – Retrieves domain registration info (requires `whois` installed)
+-  **Reverse IP Lookup** – Gets the resolved IP (basic simulation; use APIs for full data)
+-  **Subdomain Enumeration** – Simulated subdomain generation
+-  **Email Harvester** – Extracts email addresses from the homepage
+-  **Technology Fingerprinting** – Shows HTTP headers for basic tech insight
+-  **Username Check (GitHub)** – Checks if a GitHub profile exists
+-  **Username Check (Twitter, Reddit)** – Basic existence check on additional platforms
+-  **Export Results** – Saves results to `osint_report.txt`
 
 ## Installation
 
@@ -26,7 +26,7 @@ cd go-osint-scraper
 go mod tidy
 ````
 
-## 🛠️ Usage
+##  Usage
 
 ```bash
 go run main.go --domain example.com --user johndoe
@@ -37,7 +37,7 @@ go run main.go --domain example.com --user johndoe
 * `--domain`, `-d` — Domain to scan (e.g., `example.com`)
 * `--user`, `-u` — Username to check across platforms (e.g., `johndoe`)
 
-## 📝 Output
+##  Output
 
 Results are printed to the console and exported to a file called:
 
