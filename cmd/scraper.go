@@ -11,10 +11,11 @@ import (
 )
 
 var (
-	domain     string
-	username   string
-	outputPath string
-	scanPorts  bool
+	domain         string
+	username       string
+	outputPath     string
+	scanPorts      bool
+	scanVariations bool
 )
 
 const banner = `
@@ -114,6 +115,9 @@ func scanDomain(domain string, result *modules.DomainResult) {
 
 func scanUsername(username string, result *modules.UsernameResult) {
 	modules.CheckUsername(username, result)
+	if scanVariations {
+		modules.CheckUsernameVariations(username, result)
+	}
 }
 
 func Execute() {
@@ -121,6 +125,7 @@ func Execute() {
 	rootCmd.PersistentFlags().StringVarP(&username, "user", "u", "", "Username to check")
 	rootCmd.PersistentFlags().StringVarP(&outputPath, "output", "o", "osint_report.txt", "File to write the full report to")
 	rootCmd.PersistentFlags().BoolVarP(&scanPorts, "ports", "p", false, "Also scan common TCP ports on --domain (only use against hosts you're authorized to scan)")
+	rootCmd.PersistentFlags().BoolVarP(&scanVariations, "variations", "v", false, "Also check common variations of --user (e.g. user1, real_user)")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println("Error:", err)
 	}

@@ -168,11 +168,22 @@ func printUsernameResult(u modules.UsernameResult) {
 	for _, p := range u.Platforms {
 		switch {
 		case p.Error != "":
-			bad.Printf("  %-8s error: %s\n", p.Platform, p.Error)
+			bad.Printf("  %-12s error: %s\n", p.Platform, p.Error)
 		case p.Found:
-			ok.Printf("  %-8s found     %s\n", p.Platform, p.URL)
+			ok.Printf("  %-12s found     %s\n", p.Platform, p.URL)
 		default:
-			bad.Printf("  %-8s not found  %s\n", p.Platform, p.URL)
+			bad.Printf("  %-12s not found  %s\n", p.Platform, p.URL)
+		}
+	}
+
+	if len(u.Variations) > 0 {
+		section(fmt.Sprintf("Variations checked (%d)", len(u.Variations)))
+		if len(u.VariationMatches) == 0 {
+			bad.Println("  no matches found")
+		} else {
+			for _, m := range u.VariationMatches {
+				ok.Printf("  %-20s %-12s %s\n", m.Username, m.Platform, m.URL)
+			}
 		}
 	}
 }

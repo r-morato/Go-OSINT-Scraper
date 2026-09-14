@@ -157,6 +157,17 @@ func writeUsernameSection(b *strings.Builder, u UsernameResult) {
 		if p.Error != "" {
 			status = "Error: " + p.Error
 		}
-		b.WriteString(fmt.Sprintf("  %-8s %-10s %s\n", p.Platform, status, p.URL))
+		b.WriteString(fmt.Sprintf("  %-12s %-10s %s\n", p.Platform, status, p.URL))
+	}
+
+	if len(u.Variations) > 0 {
+		b.WriteString(fmt.Sprintf("\nVariations checked (%d): %s\n", len(u.Variations), strings.Join(u.Variations, ", ")))
+		if len(u.VariationMatches) == 0 {
+			b.WriteString("  (no matches found)\n")
+		} else {
+			for _, m := range u.VariationMatches {
+				b.WriteString(fmt.Sprintf("  - %-20s %-12s %s\n", m.Username, m.Platform, m.URL))
+			}
+		}
 	}
 }

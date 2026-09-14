@@ -72,6 +72,17 @@ type SubdomainCheck struct {
 type UsernameResult struct {
 	Username  string
 	Platforms []PlatformCheck
+
+	Variations       []string
+	VariationMatches []VariationMatch
+}
+
+// VariationMatch is a hit found while checking a generated variation of the
+// original username (e.g. "johndoe1") against a platform.
+type VariationMatch struct {
+	Username string
+	Platform string
+	URL      string
 }
 
 // PlatformCheck is the outcome of checking a username on one platform.
