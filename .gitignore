@@ -1,0 +1,12 @@
+# Generated reports
+osint_report.txt
+*_report.txt
+
+# Build artifacts
+/go-osint-scraper
+/osint
+*.exe
+*.test
+
+# OS/editor noise
+.DS_Store
