@@ -23,6 +23,12 @@ All domain checks run concurrently, so a full scan takes about as long as the sl
 - **Username Variations** *(opt-in via `--variations`)* – Also checks common variations of the username (`user1`, `real_user`, etc.) against the platforms reliable enough to trust for this
 - **Export Results** – Saves the full scan output to a report file
 
+<img width="1437" height="744" alt="image" src="https://github.com/user-attachments/assets/b85a7edc-4737-4e23-ab7f-5a84cb6f1b82" />
+<img width="1433" height="771" alt="image" src="https://github.com/user-attachments/assets/4bd0a6cd-fd44-4bbb-bd34-c5ea240a3602" />
+<img width="1436" height="771" alt="image" src="https://github.com/user-attachments/assets/44a4fc14-854d-4814-8252-78752787c3e3" />
+<img width="1440" height="306" alt="image" src="https://github.com/user-attachments/assets/157c48e7-1e0f-41ad-acb3-711ae6192251" />
+
+
 ## Installation
 
 Ensure you have Go installed (`go version`), then:
@@ -58,6 +64,9 @@ go run . --user johndoe --variations
 - `--output`, `-o` — File to write the full report to (default: `osint_report.txt`)
 - `--ports`, `-p` — Also scan common TCP ports on `--domain`
 - `--variations`, `-v` — Also check common variations of `--user` (e.g. `user1`, `real_user`, `the_user`)
+
+<img width="629" height="484" alt="image" src="https://github.com/user-attachments/assets/9a94efc9-f59d-4131-a277-3f2a030c4d6d" />
+
 
 ## Output
 
