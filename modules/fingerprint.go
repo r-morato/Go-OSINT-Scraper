@@ -1,21 +1,20 @@
 package modules
 
-import (
-    "fmt"
-    "net/http"
-)
+// TechFingerprint records the HTTP response headers for a domain, which can
+// hint at the server software, framework, or CDN in use.
+func TechFingerprint(domain string, result *DomainResult) {
+	req, err := newRequest("GET", "http://"+domain)
+	if err != nil {
+		result.FPError = err.Error()
+		return
+	}
 
-func TechFingerprint(domain string) {
-    fmt.Println("\n[+] Technology Fingerprint (headers):")
-    url := "http://" + domain
-    resp, err := http.Get(url)
-    if err != nil {
-        fmt.Println("Request failed:", err)
-        return
-    }
-    defer resp.Body.Close()
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		result.FPError = err.Error()
+		return
+	}
+	defer resp.Body.Close()
 
-    for k, v := range resp.Header {
-        fmt.Printf("%s: %s\n", k, v)
-    }
+	result.Headers = resp.Header
 }

@@ -1,35 +1,35 @@
 package modules
 
 import (
-    "fmt"
-    "net/http"
-    "io"
-    "regexp"
+	"io"
+	"regexp"
 )
 
-func EmailHarvester(domain string) {
-    fmt.Println("\n[+] Searching for email addresses on:", domain)
-    resp, err := http.Get("http://" + domain)
-    if err != nil {
-        fmt.Println("Failed to fetch page:", err)
-        return
-    }
-    defer resp.Body.Close()
+var emailRegex = regexp.MustCompile(`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)
 
-    body, err := io.ReadAll(resp.Body)
-    if err != nil {
-        fmt.Println("Error reading body:", err)
-        return
-    }
+// EmailHarvester fetches the domain's homepage and extracts email addresses.
+func EmailHarvester(domain string, result *DomainResult) {
+	req, err := newRequest("GET", "http://"+domain)
+	if err != nil {
+		return
+	}
 
-    re := regexp.MustCompile(`[a-zA-Z0-9._%%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)
-    emails := re.FindAllString(string(body), -1)
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
 
-    if len(emails) == 0 {
-        fmt.Println("No emails found.")
-    } else {
-        for _, email := range emails {
-            fmt.Println("Found:", email)
-        }
-    }
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+
+	seen := make(map[string]bool)
+	for _, email := range emailRegex.FindAllString(string(body), -1) {
+		if !seen[email] {
+			seen[email] = true
+			result.Emails = append(result.Emails, email)
+		}
+	}
 }
