@@ -7,6 +7,33 @@ type DomainResult struct {
 	DNSRecords []string
 	DNSError   string
 
+	MXRecords  []string
+	NSRecords  []string
+	TXTRecords []string
+	CNAME      string
+
+	SPFRecord   string
+	DMARCRecord string
+
+	TLSIssuer string
+	TLSExpiry string
+	TLSSANs   []string
+	TLSError  string
+
+	CTSubdomains []string
+	CTError      string
+
+	SecurityGrade   string
+	MissingHeaders  []string
+	SecHeadersError string
+
+	WaybackFirst string
+	WaybackLast  string
+	WaybackError string
+
+	GeoIPs     []GeoIPInfo
+	GeoIPError string
+
 	WHOIS      string
 	WHOISError string
 
@@ -15,10 +42,24 @@ type DomainResult struct {
 
 	Subdomains []SubdomainCheck
 
-	Emails []string
+	OpenPorts     []int
+	PortScanError string
+
+	Emails        []string
+	PhoneNumbers  []string
+	CryptoWallets []string
+	SocialLinks   []string
 
 	Headers map[string][]string
 	FPError string
+}
+
+// GeoIPInfo is the geolocation of one resolved IP address.
+type GeoIPInfo struct {
+	IP      string
+	Country string
+	City    string
+	ISP     string
 }
 
 // SubdomainCheck is the outcome of probing a single candidate subdomain.

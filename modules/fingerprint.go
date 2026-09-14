@@ -3,13 +3,7 @@ package modules
 // TechFingerprint records the HTTP response headers for a domain, which can
 // hint at the server software, framework, or CDN in use.
 func TechFingerprint(domain string, result *DomainResult) {
-	req, err := newRequest("GET", "http://"+domain)
-	if err != nil {
-		result.FPError = err.Error()
-		return
-	}
-
-	resp, err := httpClient.Do(req)
+	resp, err := fetch("http://" + domain)
 	if err != nil {
 		result.FPError = err.Error()
 		return
