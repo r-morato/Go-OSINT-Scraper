@@ -14,6 +14,7 @@ var (
 	domain     string
 	username   string
 	outputPath string
+	scanPorts  bool
 )
 
 const banner = `
@@ -96,8 +97,17 @@ func scanDomain(domain string, result *modules.DomainResult) {
 	run(func() { modules.GetWHOIS(domain, result) })
 	run(func() { modules.ReverseIP(domain, result) })
 	run(func() { modules.FindSubdomains(domain, result) })
-	run(func() { modules.EmailHarvester(domain, result) })
+	run(func() { modules.HarvestPage(domain, result) })
 	run(func() { modules.TechFingerprint(domain, result) })
+	run(func() { modules.DNSSweep(domain, result) })
+	run(func() { modules.TLSCertInfo(domain, result) })
+	run(func() { modules.CTSubdomainSearch(domain, result) })
+	run(func() { modules.SecurityHeadersGrade(domain, result) })
+	run(func() { modules.WaybackHistory(domain, result) })
+	run(func() { modules.GeoIPLookup(domain, result) })
+	if scanPorts {
+		run(func() { modules.PortScan(domain, result) })
+	}
 
 	wg.Wait()
 }
@@ -110,6 +120,7 @@ func Execute() {
 	rootCmd.PersistentFlags().StringVarP(&domain, "domain", "d", "", "Domain to scan")
 	rootCmd.PersistentFlags().StringVarP(&username, "user", "u", "", "Username to check")
 	rootCmd.PersistentFlags().StringVarP(&outputPath, "output", "o", "osint_report.txt", "File to write the full report to")
+	rootCmd.PersistentFlags().BoolVarP(&scanPorts, "ports", "p", false, "Also scan common TCP ports on --domain (only use against hosts you're authorized to scan)")
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println("Error:", err)
 	}

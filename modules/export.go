@@ -35,45 +35,72 @@ func ExportResults(domain DomainResult, username UsernameResult, outputPath stri
 	return nil
 }
 
+func writeList(b *strings.Builder, heading string, items []string, note string) {
+	b.WriteString("\n" + heading + ":\n")
+	if note != "" {
+		b.WriteString("  Note: " + note + "\n")
+	}
+	if len(items) == 0 {
+		b.WriteString("  (none)\n")
+		return
+	}
+	for _, item := range items {
+		b.WriteString("  - " + item + "\n")
+	}
+}
+
+func orNone(s string) string {
+	if s == "" {
+		return "(not configured)"
+	}
+	return s
+}
+
 func writeDomainSection(b *strings.Builder, d DomainResult) {
 	b.WriteString("\nDomain: " + d.Domain + "\n")
 	b.WriteString("-----------------\n")
 
-	b.WriteString("\nDNS Records:\n")
-	if d.DNSError != "" {
-		b.WriteString("  Error: " + d.DNSError + "\n")
-	}
-	for _, ip := range d.DNSRecords {
-		b.WriteString("  - " + ip + "\n")
+	writeList(b, "DNS Records", d.DNSRecords, d.DNSError)
+
+	b.WriteString("\nDNS Sweep:\n")
+	b.WriteString("  MX: " + strings.Join(d.MXRecords, ", ") + "\n")
+	b.WriteString("  NS: " + strings.Join(d.NSRecords, ", ") + "\n")
+	b.WriteString("  CNAME: " + d.CNAME + "\n")
+	b.WriteString("  SPF: " + orNone(d.SPFRecord) + "\n")
+	b.WriteString("  DMARC: " + orNone(d.DMARCRecord) + "\n")
+
+	b.WriteString("\nTLS Certificate:\n")
+	if d.TLSError != "" {
+		b.WriteString("  Error: " + d.TLSError + "\n")
+	} else {
+		b.WriteString("  Issuer: " + d.TLSIssuer + "\n")
+		b.WriteString("  Expires: " + d.TLSExpiry + "\n")
+		b.WriteString("  SANs: " + strings.Join(d.TLSSANs, ", ") + "\n")
 	}
 
-	b.WriteString("\nReverse DNS:\n")
-	if d.ReverseErr != "" {
-		b.WriteString("  Note: " + d.ReverseErr + "\n")
+	writeList(b, "Reverse DNS", d.ReverseDNS, d.ReverseErr)
+
+	b.WriteString("\nIP Geolocation:\n")
+	if d.GeoIPError != "" {
+		b.WriteString("  Note: " + d.GeoIPError + "\n")
 	}
-	for _, entry := range d.ReverseDNS {
-		b.WriteString("  - " + entry + "\n")
+	for _, g := range d.GeoIPs {
+		b.WriteString(fmt.Sprintf("  - %s: %s, %s (%s)\n", g.IP, g.City, g.Country, g.ISP))
 	}
 
-	b.WriteString("\nSubdomains found:\n")
-	found := 0
+	var probed []string
 	for _, s := range d.Subdomains {
 		if s.Found {
-			b.WriteString("  - " + s.Name + "\n")
-			found++
+			probed = append(probed, s.Name)
 		}
 	}
-	if found == 0 {
-		b.WriteString("  (none)\n")
-	}
+	writeList(b, "Subdomains (DNS probe)", probed, "")
+	writeList(b, "Subdomains (crt.sh certificate transparency)", d.CTSubdomains, d.CTError)
 
-	b.WriteString("\nEmails found:\n")
-	if len(d.Emails) == 0 {
-		b.WriteString("  (none)\n")
-	}
-	for _, e := range d.Emails {
-		b.WriteString("  - " + e + "\n")
-	}
+	writeList(b, "Emails found", d.Emails, "")
+	writeList(b, "Phone numbers found (unverified, regex-based)", d.PhoneNumbers, "")
+	writeList(b, "Crypto wallets found", d.CryptoWallets, "")
+	writeList(b, "Social links found", d.SocialLinks, "")
 
 	b.WriteString("\nHTTP Headers:\n")
 	if d.FPError != "" {
@@ -81,6 +108,34 @@ func writeDomainSection(b *strings.Builder, d DomainResult) {
 	}
 	for k, v := range d.Headers {
 		b.WriteString(fmt.Sprintf("  %s: %s\n", k, strings.Join(v, ", ")))
+	}
+
+	b.WriteString("\nSecurity Headers Grade:\n")
+	if d.SecHeadersError != "" {
+		b.WriteString("  Error: " + d.SecHeadersError + "\n")
+	} else {
+		b.WriteString("  Grade: " + d.SecurityGrade + "\n")
+		if len(d.MissingHeaders) > 0 {
+			b.WriteString("  Missing: " + strings.Join(d.MissingHeaders, ", ") + "\n")
+		}
+	}
+
+	b.WriteString("\nWayback Machine History:\n")
+	if d.WaybackError != "" {
+		b.WriteString("  Note: " + d.WaybackError + "\n")
+	} else {
+		b.WriteString("  First seen: " + d.WaybackFirst + "\n")
+		b.WriteString("  Last seen: " + d.WaybackLast + "\n")
+	}
+
+	if len(d.OpenPorts) > 0 || d.PortScanError != "" {
+		b.WriteString("\nOpen Ports:\n")
+		if d.PortScanError != "" {
+			b.WriteString("  Error: " + d.PortScanError + "\n")
+		}
+		for _, port := range d.OpenPorts {
+			b.WriteString(fmt.Sprintf("  - %d\n", port))
+		}
 	}
 
 	b.WriteString("\nWHOIS:\n")
