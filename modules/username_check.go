@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
 	"strings"
 	"sync"
@@ -89,14 +90,21 @@ func checkAllPlatforms(username string, defs []platformDef) []PlatformCheck {
 	return checks
 }
 
+// profileURL fills a "%s" URL template with the username, escaped so that
+// characters like "/", "?" or "#" can't point the check at a different page
+// (e.g. "torvalds/linux" would otherwise hit a repo and come back as found).
+func profileURL(urlTemplate, username string) string {
+	return fmt.Sprintf(urlTemplate, url.PathEscape(username))
+}
+
 // statusCodeCheck builds a checker that treats an HTTP 200 as "found". Good
 // enough for sites that return a real 404 for unknown users.
 func statusCodeCheck(urlTemplate string) func(string) PlatformCheck {
 	return func(username string) PlatformCheck {
-		url := fmt.Sprintf(urlTemplate, username)
-		check := PlatformCheck{URL: url}
+		u := profileURL(urlTemplate, username)
+		check := PlatformCheck{URL: u}
 
-		resp, err := fetch(url)
+		resp, err := fetch(u)
 		if err != nil {
 			check.Error = err.Error()
 			return check
@@ -117,9 +125,9 @@ type keybaseResponse struct {
 // keybaseCheck uses Keybase's real lookup API instead of guessing from a
 // status code, so it's the most reliable check here.
 func keybaseCheck(username string) PlatformCheck {
-	check := PlatformCheck{URL: "https://keybase.io/" + username}
+	check := PlatformCheck{URL: profileURL("https://keybase.io/%s", username)}
 
-	resp, err := fetch("https://keybase.io/_/api/1.0/user/lookup.json?username=" + username)
+	resp, err := fetch("https://keybase.io/_/api/1.0/user/lookup.json?username=" + url.QueryEscape(username))
 	if err != nil {
 		check.Error = err.Error()
 		return check
@@ -145,11 +153,11 @@ func keybaseCheck(username string) PlatformCheck {
 // which every real profile page shows) before calling it found, and reports
 // anything else as inconclusive rather than guessing.
 func hackerNewsCheck(username string) PlatformCheck {
-	url := "https://news.ycombinator.com/user?id=" + username
-	check := PlatformCheck{URL: url}
+	u := "https://news.ycombinator.com/user?id=" + url.QueryEscape(username)
+	check := PlatformCheck{URL: u}
 
 	throttle("Hacker News", 500*time.Millisecond)
-	body, err := fetchBody(url)
+	body, err := fetchBody(u)
 	if err != nil {
 		check.Error = err.Error()
 		return check
@@ -171,11 +179,11 @@ func hackerNewsCheck(username string) PlatformCheck {
 // @username" when there's no real profile behind it, so that's the marker
 // used to tell the two apart.
 func telegramCheck(username string) PlatformCheck {
-	url := "https://t.me/" + username
-	check := PlatformCheck{URL: url}
+	u := profileURL("https://t.me/%s", username)
+	check := PlatformCheck{URL: u}
 
 	throttle("Telegram", 300*time.Millisecond)
-	body, err := fetchBody(url)
+	body, err := fetchBody(u)
 	if err != nil {
 		check.Error = err.Error()
 		return check
